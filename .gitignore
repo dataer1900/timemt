@@ -5,6 +5,7 @@ www/
 scripts/
 *.md
 !README.md
+!DEPLOY.md
 package.json
 package-lock.json
 capacitor.config.json
