@@ -10,3 +10,10 @@ package.json
 package-lock.json
 capacitor.config.json
 !sw.js
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+.env*
+!.env.example
