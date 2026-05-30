@@ -127,15 +127,31 @@ document.querySelector("#fillNowButton").addEventListener("click", () => {
   fields.endTime.value = end;
 });
 
-document.querySelector("#exportButton").addEventListener("click", () => {
-  const blob = new Blob([entriesToMarkdown(entries)], { type: "text/markdown" });
+function exportEntries() {
+  const content = entriesToMarkdown(entries);
+  const fileName = `time-ledger-${todayKey()}.md`;
+
+  // iOS / Android：用 Web Share 分享到文件 App、iCloud、微信等
+  if (navigator.share && navigator.canShare) {
+    const blob = new Blob([content], { type: "text/markdown" });
+    const file = new File([blob], fileName, { type: "text/markdown" });
+    if (navigator.canShare({ files: [file] })) {
+      navigator.share({ files: [file], title: fileName }).catch(() => {});
+      return;
+    }
+  }
+
+  // 桌面端 / 不支持分享的浏览器：传统下载
+  const blob = new Blob([content], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.href = url;
-  link.download = `time-ledger-${todayKey()}.md`;
+  link.download = fileName;
   link.click();
   URL.revokeObjectURL(url);
-});
+}
+
+document.querySelector("#exportButton").addEventListener("click", () => exportEntries());
 
 importButton.addEventListener("click", () => importFile.click());
 importFile.addEventListener("change", async () => {
