@@ -1,0 +1,10 @@
+node_modules/
+android/
+www/
+.claude/
+scripts/
+*.md
+!README.md
+package.json
+package-lock.json
+capacitor.config.json

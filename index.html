@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f766e" />
+    <title>时间账本</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">柳比歇夫式时间账本</p>
+          <h1>时间账本</h1>
+        </div>
+        <div class="header-actions">
+          <button class="ghost-button" id="importButton" type="button">导入</button>
+          <button class="ghost-button" id="exportButton" type="button">导出</button>
+          <input class="hidden" id="importFile" type="file" accept=".md,text/markdown,text/plain" />
+        </div>
+      </header>
+
+      <section class="page active" id="homePage">
+        <section class="panel home-record-panel">
+          <p class="eyebrow">快速记录</p>
+          <h2>一句话记一笔</h2>
+          <div class="smart-box simple">
+            <input id="smartInput" placeholder="例如：刚才学习英语 40 分钟" />
+            <button class="smart-button" id="smartButton" type="button">记录</button>
+          </div>
+          <p id="smartPreview" class="hint">会自动推断时间、分类和价值。</p>
+          <details class="ai-settings">
+            <summary>可选 AI 解析</summary>
+            <p class="hint">开启后，会把快速记录文字发送到你配置的 AI 服务；不开启时仍使用本地规则。</p>
+            <label class="checkbox-label">
+              <input id="aiParserEnabled" type="checkbox" />
+              启用 AI 解析
+            </label>
+            <label>
+              AI 接口地址
+              <input id="aiEndpoint" placeholder="例如：https://api.deepseek.com/chat/completions" />
+            </label>
+            <label>
+              模型名
+              <input id="aiModel" placeholder="例如：gpt-4o-mini 或你的模型名" />
+            </label>
+            <label>
+              API Key <small>仅本次打开期间保存</small>
+              <input id="aiApiKey" type="password" placeholder="Bearer Token，可留空给代理接口处理" />
+            </label>
+            <button class="secondary-button" id="saveAiSettingsButton" type="button">保存 AI 设置</button>
+            <p id="aiSettingsStatus" class="hint">AI 默认关闭。</p>
+          </details>
+        </section>
+
+        <section class="ledger-panel" aria-label="今日概览">
+          <div class="ledger-total">
+            <span>今日已记录</span>
+            <strong id="todayTotal">0h</strong>
+          </div>
+          <div class="distribution-bar" aria-label="今日价值分布">
+            <div class="distribution-segment high" id="highSegment"></div>
+            <div class="distribution-segment necessary" id="necessarySegment"></div>
+            <div class="distribution-segment low" id="lowSegment"></div>
+          </div>
+          <div class="distribution-legend">
+            <span><i class="dot high"></i>高价值 <strong id="highTotal">0h</strong></span>
+            <span><i class="dot necessary"></i>必要 <strong id="necessaryTotal">0h</strong></span>
+            <span><i class="dot low"></i>低价值 <strong id="lowTotal">0h</strong></span>
+          </div>
+        </section>
+
+        <section class="timeline-panel" aria-label="今日时间轴">
+          <div class="panel-heading compact-heading">
+            <div>
+              <p class="eyebrow">当日分布</p>
+              <h2>今天的时间轴</h2>
+            </div>
+          </div>
+          <div id="dailyTimeline" class="daily-timeline"></div>
+          <div class="timeline-scale">
+            <span>0</span><span>6</span><span>12</span><span>18</span><span>24</span>
+          </div>
+        </section>
+      </section>
+
+      <section class="page" id="manualPage">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">手动记录</p>
+              <h2>补一笔完整记录</h2>
+            </div>
+            <button class="text-button" id="fillNowButton" type="button">用当前时间</button>
+          </div>
+
+          <form id="entryForm" class="entry-form">
+            <input type="hidden" id="entryId" />
+
+            <label>
+              事项
+              <input id="title" name="title" placeholder="例如：阅读、写作、刷短视频" required />
+            </label>
+
+            <div class="form-row">
+              <label>
+                开始
+                <input id="startTime" name="startTime" type="time" required />
+              </label>
+              <label>
+                结束
+                <input id="endTime" name="endTime" type="time" required />
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>
+                分类
+                <select id="category" name="category">
+                  <option>工作</option>
+                  <option>学习</option>
+                  <option>创作</option>
+                  <option>生活</option>
+                  <option>健康</option>
+                  <option>社交</option>
+                  <option>娱乐</option>
+                  <option>低价值消耗</option>
+                  <option>其他</option>
+                </select>
+              </label>
+              <label>
+                价值 <small>默认建议，可改</small>
+                <select id="valueType" name="valueType">
+                  <option value="high">高价值</option>
+                  <option value="necessary">必要消耗</option>
+                  <option value="low">低价值</option>
+                </select>
+              </label>
+            </div>
+
+            <details class="advanced-fields">
+              <summary>补充备注</summary>
+              <label>
+                备注 <small>可写并行活动、原因或感受</small>
+                <textarea id="note" name="note" rows="2" placeholder="例如：同时听播客；今天效率低"></textarea>
+              </label>
+            </details>
+
+            <button class="primary-button" type="submit">保存记录</button>
+            <button class="secondary-button hidden" id="cancelEditButton" type="button">取消编辑</button>
+          </form>
+        </section>
+      </section>
+
+      <section class="page" id="recordsPage">
+        <section class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">时间流水</p>
+              <h2 id="entryListTitle">今天还没有记录</h2>
+            </div>
+            <input id="datePicker" type="date" />
+          </div>
+          <div id="entryList" class="entry-list"></div>
+        </section>
+      </section>
+
+      <section class="page" id="reviewPage">
+        <section class="panel review-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">复盘</p>
+              <h2>最近 7 天高价值时间</h2>
+            </div>
+          </div>
+          <div id="weeklyBars" class="weekly-bars"></div>
+          <div id="categoryStats" class="category-stats"></div>
+        </section>
+      </section>
+    </main>
+
+    <nav class="tab-bar" aria-label="主导航">
+      <button class="tab-button active" data-tab-target="homePage" type="button">首页</button>
+      <button class="tab-button" data-tab-target="manualPage" type="button">手动</button>
+      <button class="tab-button" data-tab-target="recordsPage" type="button">记录</button>
+      <button class="tab-button" data-tab-target="reviewPage" type="button">复盘</button>
+    </nav>
+
+    <script src="app.js"></script>
+  </body>
+</html>
